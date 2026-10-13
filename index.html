@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 1 Test Quest — Project 4e Upgraded 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fredoka', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 45%, #fdf4ff 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, .font-game {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .btn-3d {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 0 0 rgba(0,0,0,0.2);
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 0 rgba(0,0,0,0.2);
+        }
+        .card-pop {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-pop:hover {
+            transform: translateY(-2px);
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2s infinite ease-in-out;
+        }
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(0.9); }
+            100% { opacity: 0; transform: translateY(-36px) scale(1.15); }
+        }
+        .xp-float {
+            animation: float-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        input.correct-input {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+        }
+        input.wrong-input {
+            border-color: #f43f5e !important;
+            background-color: #fff1f2 !important;
+            color: #9f1239 !important;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 pb-16">
+
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md">
+                    <i class="ph-fill ph-game-controller text-2xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Project 4e Upgraded 2</span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Unit 1 Test A</span>
+                    </div>
+                    <h1 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Quest Academy: 50-Mark Boss Prep</h1>
+                </div>
+            </div>
+
+            <!-- Gamified Stats Bar -->
+            <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+                <!-- Test Score Counter -->
+                <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                    <i class="ph-fill ph-seal-check text-emerald-600 text-lg"></i>
+                    <div class="text-xs">
+                        <span class="text-slate-500 font-semibold hidden sm:inline">Marks:</span>
+                        <span id="hud-marks" class="font-extrabold text-emerald-700 text-sm">0</span><span class="text-emerald-600 font-bold">/50</span>
+                    </div>
+                </div>
+
+                <!-- Streak Counter -->
+                <div class="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl" title="Current Answer Streak">
+                    <i class="ph-fill ph-fire text-orange-500 text-lg"></i>
+                    <span id="hud-streak" class="font-extrabold text-orange-600 text-sm">0</span>
+                </div>
+
+                <!-- XP Counter -->
+                <div class="relative flex items-center gap-1.5 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-xl">
+                    <i class="ph-fill ph-lightning text-purple-600 text-lg"></i>
+                    <span id="hud-xp" class="font-extrabold text-purple-700 text-sm">0 XP</span>
+                    <div id="xp-popup-container" class="absolute -top-2 right-2 pointer-events-none"></div>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="sound-toggle-btn" onclick="toggleSound()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Toggle Sound Effects">
+                    <i id="sound-icon" class="ph-fill ph-speaker-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mode Navigation Tabs -->
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 pt-1 pb-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="switchMainTab('test')" id="tab-btn-test" class="tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-indigo-600 text-white shrink-0">
+                <i class="ph-fill ph-exam text-lg"></i>
+                <span>1. Interactive Test (50 Marks)</span>
+            </button>
+            <button onclick="switchMainTab('arcade')" id="tab-btn-arcade" class="tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+                <i class="ph-fill ph-rocket-launch text-lg text-pink-500"></i>
+                <span>2. Speed Mini-Games</span>
+            </button>
+            <button onclick="switchMainTab('dojo')" id="tab-btn-dojo" class="tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+                <i class="ph-fill ph-cards text-lg text-amber-500"></i>
+                <span>3. Trap Buster & Flashcards</span>
+            </button>
+            <button onclick="switchMainTab('key')" id="tab-btn-key" class="tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+                <i class="ph-fill ph-key text-lg text-emerald-500"></i>
+                <span>4. Master Answer Key</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-3 sm:px-6 pt-6">
+
+        <!-- ==================== TAB 1: FULL INTERACTIVE TEST (50 MARKS) ==================== -->
+        <section id="view-test" class="space-y-6">
+            <!-- Hero Progress & Quick Jump -->
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 rounded-3xl p-5 sm:p-6 text-white shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
+                            <i class="ph-fill ph-sparkle"></i> Official Test A Structure
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Practise All 7 Exercises!</h2>
+                        <p class="text-indigo-100 text-sm mt-1">Complete each exercise, use the <strong class="text-white">💡 Hint</strong> buttons if you get stuck, and check your answers immediately!</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkAllExercises()" class="btn-3d bg-emerald-400 hover:bg-emerald-300 text-slate-900 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="ph-bold ph-check-circle text-lg"></i> Grade Entire Test (/50)
+                        </button>
+                        <button onclick="resetEntireTest()" class="btn-3d bg-white/20 hover:bg-white/30 text-white font-bold px-3.5 py-2.5 rounded-xl text-sm flex items-center gap-1.5">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overall Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs font-bold mb-1 text-indigo-100">
+                        <span>Test Completion Progress</span>
+                        <span id="overall-progress-label">0 / 50 Marks Earned</span>
+                    </div>
+                    <div class="w-full h-3.5 bg-black/25 rounded-full overflow-hidden p-0.5">
+                        <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-amber-300 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Exercise Pills -->
+                <div class="mt-4 pt-3 border-t border-white/15 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    <span class="text-xs font-bold text-indigo-100 shrink-0">Jump to:</span>
+                    <a href="#ex-1" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">🎧 Ex 1: Listening (10)</a>
+                    <a href="#ex-2" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">📧 Ex 2: Emails (10)</a>
+                    <a href="#ex-3" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">🎯 Ex 3: Multiple Choice (5)</a>
+                    <a href="#ex-4" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">💬 Ex 4: Dialogues (6)</a>
+                    <a href="#ex-5" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">⭐ Ex 5: Adverbs (5)</a>
+                    <a href="#ex-6" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">📅 Ex 6: Dates (7)</a>
+                    <a href="#ex-7" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold shrink-0">🖼️ Ex 7: Chores Pictures (7)</a>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 1: LISTENING (10 MARKS) ==================== -->
+            <div id="ex-1" class="bg-white rounded-3xl border-2 border-indigo-100 shadow-sm overflow-hidden">
+                <div class="bg-indigo-50/80 px-5 py-4 border-b border-indigo-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-display font-bold flex items-center justify-center text-lg">1</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Listen and complete the sentences. Use 1–3 words or a date.</h3>
+                            <p class="text-xs text-slate-500">2 marks per question • Total: 10 marks</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="score-badge-ex1" class="px-3 py-1 rounded-full bg-white border border-indigo-200 text-indigo-700 font-extrabold text-xs">0 / 10 Marks</span>
+                    </div>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-5">
+                    <!-- Built-in Audio Studio -->
+                    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-4 sm:p-5 shadow-md">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-11 h-11 rounded-xl bg-indigo-500/30 border border-indigo-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="ph-fill ph-headphones text-2xl text-indigo-300"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Built-In Listening Track</span>
+                                        <span id="audio-status-pill" class="text-[11px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-semibold">Ready</span>
+                                    </div>
+                                    <p class="text-sm text-slate-200 mt-0.5">Press <strong>Play Audio</strong> to hear Jordan &amp; Audrey talk about their household jobs and family birthdays!</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                <button onclick="playEx1Audio(1.0)" class="btn-3d bg-indigo-500 hover:bg-indigo-400 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5">
+                                    <i class="ph-fill ph-play"></i> Play Audio (1x)
+                                </button>
+                                <button onclick="playEx1Audio(0.8)" class="btn-3d bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5" title="Slow & Clear Speed">
+                                    <i class="ph-fill ph-tortoise"></i> Slow (0.8x)
+                                </button>
+                                <button onclick="stopSpeech()" class="btn-3d bg-rose-600/80 hover:bg-rose-500 text-white font-bold px-3 py-2 rounded-xl text-xs sm:text-sm">
+                                    <i class="ph-fill ph-stop"></i>
+                                </button>
+                                <button onclick="toggleEx1Transcript()" class="btn-3d bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 border border-amber-400/30 font-bold px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1">
+                                    <i class="ph-bold ph-scroll"></i> Script / Key Note
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Audio Transcript & Classroom Note -->
+                        <div id="ex1-transcript-box" class="hidden mt-4 pt-3 border-t border-white/15 text-xs sm:text-sm text-slate-200 space-y-2">
+                            <p class="text-amber-300 font-semibold"><i class="ph-fill ph-info"></i> Practice Audio Script (plus smart grading for alternative classroom dates/activities):</p>
+                            <div class="grid sm:grid-cols-2 gap-3 bg-white/5 p-3 rounded-xl">
+                                <div>
+                                    <strong class="text-indigo-300">Part 1 — Jordan:</strong><br>
+                                    "In my house, we all help with jobs. My dad usually cooks the dinner. My sister <strong>sets</strong> the table before dinner, and I make my bed in the morning after I <strong>get up</strong>."
+                                </div>
+                                <div>
+                                    <strong class="text-pink-300">Part 2 — Audrey:</strong><br>
+                                    "We have lots of birthdays in our family! My brother's birthday is on <strong>16 May</strong> (the sixteenth of May). On my birthday, I usually go <strong>bowling</strong> (or to the cinema) with my friends. And my uncle's birthday is on <strong>29 February</strong>!"
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-300">💡 <em>Tip: Our smart checker accepts both the audio script answers above AND other valid Unit 1 dates/activities so you can practise the exact grammar patterns!</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Example Row -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm flex items-center gap-3">
+                        <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase">Example</span>
+                        <span class="text-slate-700">Jordan's dad <strong class="underline decoration-indigo-500 decoration-2 text-indigo-700">usually cooks</strong> the dinner.</span>
+                    </div>
+
+                    <!-- Ex 1 Questions Container -->
+                    <div id="ex1-questions" class="space-y-3"></div>
+
+                    <!-- Action Row -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise1()" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 1
+                            </button>
+                            <button onclick="fillExercise1Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex1" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 2: READ THE EMAILS (10 MARKS) ==================== -->
+            <div id="ex-2" class="bg-white rounded-3xl border-2 border-purple-100 shadow-sm overflow-hidden">
+                <div class="bg-purple-50/80 px-5 py-4 border-b border-purple-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-purple-600 text-white font-display font-bold flex items-center justify-center text-lg">2</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Read the emails and answer the questions.</h3>
+                            <p class="text-xs text-slate-500">2 marks per question • Total: 10 marks • Click highlighted clues if you need help!</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleEmailClues()" class="px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-xs flex items-center gap-1 transition">
+                            <i class="ph-fill ph-highlighterCircle"></i> Highlight Clues in Emails
+                        </button>
+                        <span id="score-badge-ex2" class="px-3 py-1 rounded-full bg-white border border-purple-200 text-purple-700 font-extrabold text-xs">0 / 10 Marks</span>
+                    </div>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-6">
+                    <!-- Two Emails Side by Side -->
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Email 1: Julien -->
+                        <div class="bg-sky-50/60 border-2 border-sky-200 rounded-2xl p-4 shadow-sm relative">
+                            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-sky-200/80">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center text-sm">J</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-800">From: Julien</div>
+                                        <div class="text-[11px] text-slate-500">To: Eva • Subject: Jobs at home</div>
+                                    </div>
+                                </div>
+                                <button onclick="speakText(`Hi, Eva. How are you? Do you do many jobs at home? I do a lot. It isn't fair! In the morning, I always feed the cat and take out the recycling, but my sister, Vicky, never does jobs like that. She's only got one easy job: she takes our dog for a walk after breakfast. Oh, OK, and she makes her bed before she goes to school. I usually set the table and load the dishwasher in the evenings. Tell me about your jobs at home. Love, Julien`)" class="text-xs bg-white hover:bg-sky-100 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
+                                    <i class="ph-fill ph-speaker-high"></i> Read Aloud
+                                </button>
+                            </div>
+                            <div class="text-sm leading-relaxed text-slate-700 space-y-2">
+                                <p class="font-semibold text-slate-900">Hi, Eva</p>
+                                <p>How are you? Do you do many jobs at home? I do a lot. It isn't fair! In the morning, I always feed the cat and take out the recycling, but my sister, Vicky, never does jobs like that. She's only got one easy job: <span class="email-clue transition-colors rounded px-0.5" data-q="Q1">she takes our dog for a walk after breakfast</span>. Oh, OK, and <span class="email-clue transition-colors rounded px-0.5" data-q="Q2">she makes her bed before she goes to school</span>. I usually set the table and load the dishwasher in the evenings.</p>
+                                <p>Tell me about your jobs at home.</p>
+                                <p class="font-semibold text-slate-900">Love,<br>Julien</p>
+                            </div>
+                        </div>
+
+                        <!-- Email 2: Eva -->
+                        <div class="bg-pink-50/60 border-2 border-pink-200 rounded-2xl p-4 shadow-sm relative">
+                            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-pink-200/80">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold flex items-center justify-center text-sm">E</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-800">From: Eva</div>
+                                        <div class="text-[11px] text-slate-500">To: Julien • Subject: Re: Jobs &amp; Birthday!</div>
+                                    </div>
+                                </div>
+                                <button onclick="speakText(`Hi, Julien. I'm well, thanks. I'm sorry about all your jobs! I haven't got many jobs at home. I sometimes tidy my bedroom, but my mum usually does it. My only pet is a fish. I feed it, but that's easy. I don't take it for a walk! My parents clean the kitchen and my brother loads the dishwasher. Is it your birthday next month? I think it's on 8 October. Is that right? Well, my birthday is on 15 October. We can have a party on the weekend between our birthdays, on Saturday 12 October. What do you think? Let me know. Love, Eva`)" class="text-xs bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
+                                    <i class="ph-fill ph-speaker-high"></i> Read Aloud
+                                </button>
+                            </div>
+                            <div class="text-sm leading-relaxed text-slate-700 space-y-2">
+                                <p class="font-semibold text-slate-900">Hi, Julien</p>
+                                <p>I'm well, thanks. I'm sorry about all your jobs! I haven't got many jobs at home. <span class="email-clue transition-colors rounded px-0.5" data-q="Q3">I sometimes tidy my bedroom, but my mum usually does it.</span> My only pet is a fish. <span class="email-clue transition-colors rounded px-0.5" data-q="Q4">I feed it</span>, but that's easy. I don't take it for a walk! My parents clean the kitchen and my brother loads the dishwasher.</p>
+                                <p>Is it your birthday next month? I think it's on 8 October. Is that right? Well, my birthday is on 15 October. <span class="email-clue transition-colors rounded px-0.5" data-q="Q5">We can have a party on the weekend between our birthdays, on Saturday 12 October.</span> What do you think? Let me know.</p>
+                                <p class="font-semibold text-slate-900">Love,<br>Eva</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example Row -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase">Example</span>
+                        <span class="font-semibold text-slate-700">When does Julien feed the cat?</span>
+                        <span class="text-purple-700 font-bold">→ He feeds the cat in the morning.</span>
+                    </div>
+
+                    <!-- Ex 2 Questions Container -->
+                    <div id="ex2-questions" class="space-y-4"></div>
+
+                    <!-- Action Row -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise2()" class="btn-3d bg-purple-600 hover:bg-purple-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 2
+                            </button>
+                            <button onclick="fillExercise2Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex2" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 3: CHOOSE THE CORRECT ANSWER (5 MARKS) ==================== -->
+            <div id="ex-3" class="bg-white rounded-3xl border-2 border-amber-100 shadow-sm overflow-hidden">
+                <div class="bg-amber-50/80 px-5 py-4 border-b border-amber-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-amber-500 text-white font-display font-bold flex items-center justify-center text-lg">3</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Choose the correct answer.</h3>
+                            <p class="text-xs text-slate-500">1 mark per question • Total: 5 marks • Tap A, B, or C!</p>
+                        </div>
+                    </div>
+                    <span id="score-badge-ex3" class="px-3 py-1 rounded-full bg-white border border-amber-200 text-amber-700 font-extrabold text-xs">0 / 5 Marks</span>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-4">
+                    <!-- Example -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase mr-2">Example</span>
+                            <span>Tom's dad <strong class="text-amber-700 underline">teaches</strong> Maths and PE.</span>
+                        </div>
+                        <div class="flex gap-2 text-xs font-bold">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white">✓ A teaches</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-500">B teach</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-500">C don't teach</span>
+                        </div>
+                    </div>
+
+                    <!-- Ex 3 Questions Container -->
+                    <div id="ex3-questions" class="space-y-3"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <button onclick="checkExercise3()" class="btn-3d bg-amber-500 hover:bg-amber-400 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="ph-bold ph-check"></i> Check Exercise 3
+                        </button>
+                        <span id="feedback-ex3" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 4: DIALOGUES IN PRESENT SIMPLE (6 MARKS) ==================== -->
+            <div id="ex-4" class="bg-white rounded-3xl border-2 border-emerald-100 shadow-sm overflow-hidden">
+                <div class="bg-emerald-50/80 px-5 py-4 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-display font-bold flex items-center justify-center text-lg">4</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Complete the dialogues with the present simple. Use the verbs in brackets.</h3>
+                            <p class="text-xs text-slate-500">1 mark per question • Total: 6 marks • Watch out for <em>do / does</em> and short answers!</p>
+                        </div>
+                    </div>
+                    <span id="score-badge-ex4" class="px-3 py-1 rounded-full bg-white border border-emerald-200 text-emerald-700 font-extrabold text-xs">0 / 6 Marks</span>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-4">
+                    <!-- Example -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm">
+                        <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase mr-2">Example</span>
+                        <strong>A:</strong> <span class="text-emerald-700 font-bold underline">Do you take</span> (you / take) the bus to school? &nbsp;|&nbsp; <strong>B:</strong> Yes, I do.
+                    </div>
+
+                    <div id="ex4-questions" class="grid sm:grid-cols-2 gap-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise4()" class="btn-3d bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 4
+                            </button>
+                            <button onclick="fillExercise4Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex4" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 5: ADVERBS OF FREQUENCY (5 MARKS) ==================== -->
+            <div id="ex-5" class="bg-white rounded-3xl border-2 border-pink-100 shadow-sm overflow-hidden">
+                <div class="bg-pink-50/80 px-5 py-4 border-b border-pink-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-pink-600 text-white font-display font-bold flex items-center justify-center text-lg">5</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Rewrite the sentences. Use adverbs of frequency.</h3>
+                            <p class="text-xs text-slate-500">1 mark per question • Total: 5 marks</p>
+                        </div>
+                    </div>
+                    <span id="score-badge-ex5" class="px-3 py-1 rounded-full bg-white border border-pink-200 text-pink-700 font-extrabold text-xs">0 / 5 Marks</span>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-5">
+                    <!-- Star Key Table from Test Paper -->
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 bg-gradient-to-r from-pink-50 to-purple-50 p-3.5 rounded-2xl border border-pink-200">
+                        <div class="bg-white rounded-xl p-2.5 text-center border border-pink-100 shadow-sm">
+                            <div class="text-lg font-extrabold text-rose-500">—</div>
+                            <div class="font-display font-bold text-slate-800 text-sm">never</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-2.5 text-center border border-pink-100 shadow-sm">
+                            <div class="text-lg font-extrabold text-amber-500">★</div>
+                            <div class="font-display font-bold text-slate-800 text-sm">not often <span class="text-[10px] text-slate-500 block">(don't often)</span></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-2.5 text-center border border-pink-100 shadow-sm">
+                            <div class="text-lg font-extrabold text-amber-500">★★</div>
+                            <div class="font-display font-bold text-slate-800 text-sm">sometimes</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-2.5 text-center border border-pink-100 shadow-sm">
+                            <div class="text-lg font-extrabold text-amber-500">★★★</div>
+                            <div class="font-display font-bold text-slate-800 text-sm">usually</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-2.5 text-center border border-pink-100 shadow-sm col-span-2 sm:col-span-1">
+                            <div class="text-lg font-extrabold text-amber-500">★★★★</div>
+                            <div class="font-display font-bold text-slate-800 text-sm">always</div>
+                        </div>
+                    </div>
+
+                    <!-- Example -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm">
+                        <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase mr-2">Example</span>
+                        She forgets her brother's birthday. (★★) → <strong class="text-pink-700 underline">She sometimes forgets her brother's birthday.</strong>
+                    </div>
+
+                    <div id="ex5-questions" class="space-y-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise5()" class="btn-3d bg-pink-600 hover:bg-pink-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 5
+                            </button>
+                            <button onclick="fillExercise5Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex5" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 6: WRITE THE DATES (7 MARKS) ==================== -->
+            <div id="ex-6" class="bg-white rounded-3xl border-2 border-cyan-100 shadow-sm overflow-hidden">
+                <div class="bg-cyan-50/80 px-5 py-4 border-b border-cyan-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-cyan-600 text-white font-display font-bold flex items-center justify-center text-lg">6</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Write the dates.</h3>
+                            <p class="text-xs text-slate-500">1 mark per question • Total: 7 marks • Spell out the ordinal number and the month!</p>
+                        </div>
+                    </div>
+                    <span id="score-badge-ex6" class="px-3 py-1 rounded-full bg-white border border-cyan-200 text-cyan-700 font-extrabold text-xs">0 / 7 Marks</span>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-4">
+                    <!-- Example -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-sm flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs uppercase">Example</span>
+                        <span class="font-bold text-slate-700">day 2 of month 1</span>
+                        <span>→ the <strong class="text-cyan-700 underline">second</strong> of <strong class="text-cyan-700 underline">January</strong></span>
+                    </div>
+
+                    <div id="ex6-questions" class="grid sm:grid-cols-2 gap-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise6()" class="btn-3d bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 6
+                            </button>
+                            <button onclick="fillExercise6Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex6" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== EXERCISE 7: HOUSEHOLD CHORES PICTURES (7 MARKS) ==================== -->
+            <div id="ex-7" class="bg-white rounded-3xl border-2 border-violet-100 shadow-sm overflow-hidden">
+                <div class="bg-violet-50/80 px-5 py-4 border-b border-violet-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-violet-600 text-white font-display font-bold flex items-center justify-center text-lg">7</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">Look at pictures 1–8 and complete the sentences.</h3>
+                            <p class="text-xs text-slate-500">1 mark per question • Total: 7 marks • Careful with <em>I / You</em> vs <em>He / She</em> (-s)!</p>
+                        </div>
+                    </div>
+                    <span id="score-badge-ex7" class="px-3 py-1 rounded-full bg-white border border-violet-200 text-violet-700 font-extrabold text-xs">0 / 7 Marks</span>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-5">
+                    <!-- Word Bank Helper Toggle -->
+                    <div class="bg-violet-50/60 border border-violet-200 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-2">
+                        <div class="text-xs sm:text-sm text-violet-950">
+                            <i class="ph-fill ph-lightbulb text-amber-500 text-base"></i>
+                            <strong>Grammar Alert:</strong> Check the person at the start of each sentence! Does the verb need an <strong>-s</strong> or NOT?
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 text-xs font-bold">
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-slate-500 line-through">loads (Ex)</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">tidy / tidies</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">set / sets</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">take / takes</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">do / does</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">vacuum / vacuums</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">make / makes</span>
+                            <span class="px-2 py-1 bg-white rounded-lg border border-violet-200 text-violet-700">feed / feeds</span>
+                        </div>
+                    </div>
+
+                    <!-- 8 Illustrated Chore Cards Grid -->
+                    <div id="ex7-questions" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkExercise7()" class="btn-3d bg-violet-600 hover:bg-violet-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                                <i class="ph-bold ph-check"></i> Check Exercise 7
+                            </button>
+                            <button onclick="fillExercise7Sample()" class="btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm">
+                                Show Model Answers
+                            </button>
+                        </div>
+                        <span id="feedback-ex7" class="text-sm font-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: SPEED MINI-GAMES ARCADE ==================== -->
+        <section id="view-arcade" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 rounded-3xl p-6 text-white shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider">Arcade Mode</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold mt-1">⚡ 60-Second Test Blitz!</h2>
+                        <p class="text-rose-100 text-sm">Train your reflexes on the exact grammar, dates, and chores from Unit 1 Test A!</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="startArcadeGame('all')" class="btn-3d bg-white text-rose-600 font-extrabold px-4 py-2.5 rounded-xl text-sm flex items-center gap-1.5">
+                            <i class="ph-fill ph-play-circle text-lg"></i> Play Mixed Boss Blitz
+                        </button>
+                        <button onclick="startArcadeGame('dates')" class="btn-3d bg-amber-300 text-slate-900 font-extrabold px-4 py-2.5 rounded-xl text-sm flex items-center gap-1.5">
+                            <i class="ph-fill ph-calendar-star text-lg"></i> Dates Only
+                        </button>
+                        <button onclick="startArcadeGame('grammar')" class="btn-3d bg-indigo-900 text-white font-extrabold px-4 py-2.5 rounded-xl text-sm flex items-center gap-1.5">
+                            <i class="ph-fill ph-lightning text-lg"></i> Grammar &amp; Chores
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arcade Arena Card -->
+            <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 sm:p-8 shadow-sm text-center max-w-3xl mx-auto">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2 text-left">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                            <i class="ph-fill ph-timer text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 font-bold uppercase">Time Left</div>
+                            <div id="arcade-timer" class="text-xl font-display font-bold text-slate-800">60s</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span id="arcade-category-badge" class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-extrabold uppercase">Ready to Start</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-right">
+                        <div>
+                            <div class="text-xs text-slate-400 font-bold uppercase">Arcade Score</div>
+                            <div id="arcade-score" class="text-xl font-display font-bold text-emerald-600">0 pts</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                            <i class="ph-fill ph-trophy text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="arcade-stage" class="py-6 space-y-6">
+                    <div class="w-20 h-20 rounded-3xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
+                        <i class="ph-fill ph-rocket-launch text-5xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">Ready to Beat Your High Score?</h3>
+                    <p class="text-slate-500 max-w-md mx-auto text-sm">Answer as many test questions as you can in 60 seconds! Every correct answer gives you +25 XP and builds your combo multiplier.</p>
+                    <button onclick="startArcadeGame('all')" class="btn-3d bg-gradient-to-r from-rose-500 to-amber-500 text-white font-display font-bold text-lg px-8 py-3.5 rounded-2xl">
+                        Launch 60s Blitz Now!
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: TRAP BUSTER & FLASHCARDS DOJO ==================== -->
+        <section id="view-dojo" class="hidden space-y-6">
+            <!-- Top 5 Exam Traps Banner -->
+            <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 sm:p-6 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <i class="ph-fill ph-warning-octagon text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Top 5 "Test Traps" to Watch Out For!</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Read these 5 secrets before the test so you don't lose easy marks!</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200">
+                        <span class="text-xs font-extrabold uppercase text-rose-600">Trap #1 • Exercise 6 Spelling</span>
+                        <h4 class="font-bold text-slate-900 mt-1">12th, 29th &amp; February!</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            • 12th = <strong>twelfth</strong> (drop the <em>ve</em>, write <strong>f</strong>!)<br>
+                            • 29th = <strong>twenty-ninth</strong> (no <em>e</em> in ninth!)<br>
+                            • Month 2 = <strong>February</strong> (don't forget the first <strong>r</strong>: Feb-<strong>r</strong>-uary!)
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200">
+                        <span class="text-xs font-extrabold uppercase text-indigo-600">Trap #2 • Exercise 5 (#5)</span>
+                        <h4 class="font-bold text-slate-900 mt-1">"Rafi is sometimes busy"</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Adverbs of frequency go <strong>BEFORE</strong> normal verbs (<em>I always walk</em>), but they go <strong>AFTER</strong> <em>am / is / are</em>!<br>
+                            ✅ <strong>Rafi is sometimes busy on Saturday mornings.</strong>
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+                        <span class="text-xs font-extrabold uppercase text-emerald-600">Trap #3 • Exercise 7 (#2 &amp; #6)</span>
+                        <h4 class="font-bold text-slate-900 mt-1">Don't put "-s" after I or You!</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            In Exercise 7, most sentences use He/She (<em>Tessa sets, Sam takes, Dad does, Freddie makes, Lucy feeds</em>), EXCEPT:<br>
+                            • #2: <strong>I tidy</strong> my room.<br>
+                            • #6: <strong>You vacuum</strong> the floor.
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200">
+                        <span class="text-xs font-extrabold uppercase text-purple-600">Trap #4 • Exercise 4 (#1 &amp; #2)</span>
+                        <h4 class="font-bold text-slate-900 mt-1">Does + Base Verb (No -s!)</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            When you make a question with <strong>does</strong>, the main verb goes back to normal without <em>-s</em>:<br>
+                            ✅ What time <strong>does the train leave</strong>?<br>
+                            ✅ <strong>Does Xu go</strong> to your school?
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 md:col-span-2">
+                        <span class="text-xs font-extrabold uppercase text-amber-700">Trap #5 • Exercise 5 (#2) "not often"</span>
+                        <h4 class="font-bold text-slate-900 mt-1">How to use "not often" (*) in a sentence</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            For <em>"We go to the park in winter. (*)"</em>, because <em>not often</em> is negative, in English we add <strong>don't</strong> before the verb:<br>
+                            ✅ <strong>We don't often go to the park in winter.</strong> (Our checker also recognizes if your class writes <em>We not often go...</em>, and shows you both!)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Flip Flashcards -->
+            <div class="bg-white rounded-3xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">🃏 Interactive Flip Flashcards (All Test Questions)</h3>
+                        <p class="text-xs text-slate-500">Click any card to flip it and check the exact test answer!</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterFlashcards('all')" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">All Cards</button>
+                        <button onclick="filterFlashcards('Emails & Reading')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">Ex 2: Emails</button>
+                        <button onclick="filterFlashcards('Grammar & Dialogues')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">Ex 3–5: Grammar</button>
+                        <button onclick="filterFlashcards('Dates & Chores')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">Ex 6–7: Dates &amp; Chores</button>
+                    </div>
+                </div>
+
+                <div id="flashcards-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: MASTER ANSWER KEY ==================== -->
+        <section id="view-key" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 sm:p-6 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-slate-200">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold uppercase">Complete Reference</span>
+                        <h2 class="text-2xl font-bold text-slate-900 mt-1">Project 4e Upgraded 2 — Unit 1 Test A Answer Key</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Study every answer and explanation below, or jump back to the test to practise without looking!</p>
+                    </div>
+                    <button onclick="switchMainTab('test')" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                        <i class="ph-bold ph-pencil-simple"></i> Back to Practice Test
+                    </button>
+                </div>
+
+                <div id="master-key-content" class="space-y-6"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Celebration Modal -->
+    <div id="celebration-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-2 border-indigo-100 animate-pulse-soft">
+            <div id="modal-badge-icon" class="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center mx-auto shadow-lg mb-4">
+                <i class="ph-fill ph-crown text-5xl"></i>
+            </div>
+            <h3 id="modal-title" class="text-2xl font-bold text-slate-900">Test Graded!</h3>
+            <p id="modal-subtitle" class="text-sm text-slate-600 mt-1">Here is how you did on Unit 1 Test A:</p>
+            <div class="my-5 bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                <div class="text-xs font-bold uppercase text-slate-400">Total Score</div>
+                <div id="modal-score" class="text-4xl font-display font-bold text-indigo-600 mt-1">0 / 50</div>
+                <div id="modal-percent" class="text-xs font-extrabold text-emerald-600 mt-1">0%</div>
+            </div>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeCelebrationModal()" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+                    Review My Answers
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== STATE & SOUND ENGINE ====================
+        let soundEnabled = true;
+        let totalXP = 0;
+        let currentStreak = 0;
+        let sectionScores = { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex5: 0, ex6: 0, ex7: 0 };
+        let cluesHighlighted = false;
+
+        // Web Audio Synthesizer for Gamified Sound Effects
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playTone(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                const now = audioCtx.currentTime;
+                if (type === 'correct') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.22);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'fanfare') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.35);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.09);
+                        osc.stop(now + idx * 0.09 + 0.35);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            icon.className = soundEnabled ? 'ph-fill ph-speaker-high text-lg' : 'ph-fill ph-speaker-slash text-lg text-rose-500';
+        }
+
+        function awardXP(amount) {
+            totalXP += amount;
+            document.getElementById('hud-xp').textContent = `${totalXP} XP`;
+            const container = document.getElementById('xp-popup-container');
+            const badge = document.createElement('div');
+            badge.className = 'xp-float text-xs font-extrabold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-300 shadow-sm';
+            badge.textContent = `+${amount} XP`;
+            container.appendChild(badge);
+            setTimeout(() => badge.remove(), 900);
+        }
+
+        function updateHUDMarks() {
+            const total = Object.values(sectionScores).reduce((a, b) => a + b, 0);
+            document.getElementById('hud-marks').textContent = total;
+            document.getElementById('overall-progress-label').textContent = `${total} / 50 Marks Earned`;
+            document.getElementById('overall-progress-bar').style.width = `${(total / 50) * 100}%`;
+            return total;
+        }
+
+        // Speech synthesis helper (British English preferred)
+        function speakText(text, rate = 0.95) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const gbVoice = voices.find(v => v.lang.includes('en-GB')) || voices.find(v => v.lang.includes('en'));
+            if (gbVoice) utter.voice = gbVoice;
+            utter.lang = 'en-GB';
+            utter.rate = rate;
+            utter.onstart = () => {
+                const pill = document.getElementById('audio-status-pill');
+                if (pill) {
+                    pill.textContent = '🔊 Playing...';
+                    pill.className = 'text-[11px] bg-amber-500/30 text-amber-200 px-2 py-0.5 rounded-full font-semibold';
+                }
+            };
+            utter.onend = () => {
+                const pill = document.getElementById('audio-status-pill');
+                if (pill) {
+                    pill.textContent = 'Ready';
+                    pill.className = 'text-[11px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-semibold';
+                }
+            };
+            window.speechSynthesis.speak(utter);
+        }
+
+        function stopSpeech() {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            const pill = document.getElementById('audio-status-pill');
+            if (pill) {
+                pill.textContent = 'Stopped';
+                pill.className = 'text-[11px] bg-slate-500/30 text-slate-300 px-2 py-0.5 rounded-full font-semibold';
+            }
+        }
+
+        function playEx1Audio(rate = 1.0) {
+            const script = "Part 1. Jordan. In my house, we all help with jobs. My dad usually cooks the dinner. My sister sets the table before dinner, and I make my bed in the morning after I get up. ... Part 2. Audrey. We have lots of birthdays in our family! My brother's birthday is on the sixteenth of May. On my birthday, I usually go bowling with my friends. And my uncle's birthday is on the twenty-ninth of February!";
+            speakText(script, rate);
+        }
+
+        function toggleEx1Transcript() {
+            const box = document.getElementById('ex1-transcript-box');
+            box.classList.toggle('hidden');
+        }
+
+        // ==================== TEST DATA DEFINITIONS ====================
+        // Exercise 1 Data (10 marks - 2 marks each)
+        const ex1Data = [
+            {
+                id: 1,
+                before: "Jordan's sister",
+                after: "the table.",
+                model: "sets",
+                accepted: ["sets", "usually sets", "always sets", "never sets", "sometimes sets", "clears"],
+                hint: "What household job do we do to 'the table' before dinner? Don't forget the -s for 'Jordan's sister'!",
+                explanation: "'Jordan's sister' is 3rd person singular (she), so we use 'sets' (sets the table)."
+            },
+            {
+                id: 2,
+                before: "Jordan makes his bed after he",
+                after: ".",
+                model: "gets up",
+                accepted: ["gets up", "wakes up", "gets dressed", "has breakfast"],
+                hint: "What does Jordan do first in the morning? Remember: after 'he', the verb needs an -s (e.g., gets up / has breakfast)!",
+                explanation: "After 'he', we need the 3rd person singular form: 'gets up' (or 'has breakfast' / 'gets dressed')."
+            },
+            {
+                id: 3,
+                before: "Audrey's brother's birthday is on",
+                after: ".",
+                model: "16 May",
+                accepted: ["16 may", "16th may", "the sixteenth of may", "sixteenth of may", "the 16th of may", "may 16", "may 16th"],
+                acceptAnyValidDate: true,
+                hint: "Write the date from the audio ('16 May' or 'the sixteenth of May' — or any valid English date format!).",
+                explanation: "In the audio, her brother's birthday is on 16 May (the sixteenth of May)."
+            },
+            {
+                id: 4,
+                before: "Audrey usually goes",
+                after: "on her birthday.",
+                model: "bowling",
+                accepted: ["bowling", "swimming", "shopping", "to the cinema", "out", "skating", "dancing", "to a restaurant", "to a party"],
+                hint: "After 'goes', use an -ing activity (like 'bowling' or 'swimming') or 'to the cinema'!",
+                explanation: "With 'goes', we use activities like 'goes bowling', 'goes swimming', 'goes shopping', or 'goes to the cinema'."
+            },
+            {
+                id: 5,
+                before: "Audrey's uncle's birthday is on",
+                after: ".",
+                model: "29 February",
+                accepted: ["29 february", "29th february", "the twenty-ninth of february", "twenty-ninth of february", "the 29th of february"],
+                acceptAnyValidDate: true,
+                hint: "In the audio, her uncle has a leap-year birthday: '29 February' (or 'the twenty-ninth of February').",
+                explanation: "29 February (the twenty-ninth of February) is a classic Unit 1 leap-year birthday date!"
+            }
+        ];
+
+        // Exercise 2 Data: Read the emails (10 marks - 2 marks each)
+        const ex2Data = [
+            {
+                id: 1,
+                question: "What does Julien's sister do after breakfast?",
+                model: "She takes the dog for a walk.",
+                accepted: [
+                    "she takes the dog for a walk",
+                    "she takes their dog for a walk",
+                    "she takes our dog for a walk",
+                    "takes the dog for a walk",
+                    "takes their dog for a walk",
+                    "vicky takes the dog for a walk",
+                    "take the dog for a walk"
+                ],
+                hint: "Look at Julien's email: 'she takes our dog for a walk after breakfast.' Start your answer with 'She takes...'",
+                explanation: "In Julien's email: 'she takes our dog for a walk after breakfast.' → She takes the dog for a walk."
+            },
+            {
+                id: 2,
+                question: "What does Julien's sister do before she goes to school?",
+                model: "She makes her bed.",
+                accepted: [
+                    "she makes her bed",
+                    "she makes the bed",
+                    "makes her bed",
+                    "makes the bed",
+                    "vicky makes her bed",
+                    "make her bed"
+                ],
+                hint: "Look at the next sentence in Julien's email: 'and she makes her bed before she goes to school.'",
+                explanation: "In Julien's email: 'she makes her bed before she goes to school.' → She makes her bed."
+            },
+            {
+                id: 3,
+                question: "Who usually tidies Eva's bedroom?",
+                model: "Her mum usually tidies it.",
+                accepted: [
+                    "her mum",
+                    "eva's mum",
+                    "her mother",
+                    "eva's mother",
+                    "her mum usually tidies it",
+                    "her mum usually tidies her bedroom",
+                    "her mum does",
+                    "her mum usually does it",
+                    "eva's mum usually tidies her bedroom",
+                    "eva's mum does",
+                    "mum"
+                ],
+                hint: "Look at Eva's email: 'I sometimes tidy my bedroom, but my mum usually does it.' Whose mum is it?",
+                explanation: "Eva writes: 'I sometimes tidy my bedroom, but my mum usually does it.' → Her mum (or Eva's mum)."
+            },
+            {
+                id: 4,
+                question: "What does Eva do for her pet fish?",
+                model: "She feeds it.",
+                accepted: [
+                    "she feeds it",
+                    "she feeds her fish",
+                    "she feeds the fish",
+                    "she feeds her pet fish",
+                    "feeds it",
+                    "feeds the fish",
+                    "eva feeds it",
+                    "feed it"
+                ],
+                hint: "Look at Eva's email: 'My only pet is a fish. I feed it, but that's easy.' Remember to change 'I feed' to 'She feeds'!",
+                explanation: "Eva writes: 'My only pet is a fish. I feed it.' → She feeds it."
+            },
+            {
+                id: 5,
+                question: "When does Eva want a party?",
+                model: "On Saturday 12 October.",
+                accepted: [
+                    "on saturday 12 october",
+                    "saturday 12 october",
+                    "on 12 october",
+                    "12 october",
+                    "on saturday 12th october",
+                    "on 12th october",
+                    "on the twelfth of october",
+                    "on saturday the twelfth of october",
+                    "on the weekend between their birthdays",
+                    "on the weekend between our birthdays",
+                    "on saturday, 12 october"
+                ],
+                hint: "Look at the end of Eva's email: 'We can have a party on the weekend between our birthdays, on Saturday 12 October.'",
+                explanation: "Eva suggests having the party 'on Saturday 12 October' (on the weekend between their birthdays)."
+            }
+        ];
+
+        // Exercise 3 Data: Multiple choice (5 marks - 1 mark each)
+        const ex3Data = [
+            {
+                id: 1,
+                sentenceStart: "My mum",
+                sentenceEnd: "sport on TV.",
+                options: { A: "not watch", B: "don't watch", C: "doesn't watch" },
+                correct: "C",
+                hint: "'My mum' is 'she' (3rd person singular). Which negative word goes with he/she/it?",
+                explanation: "'My mum' = she, so the present simple negative is 'doesn't watch'."
+            },
+            {
+                id: 2,
+                sentenceStart: "We",
+                sentenceEnd: "swimming on Monday mornings.",
+                options: { A: "go", B: "goes", C: "going" },
+                correct: "A",
+                hint: "The subject is 'We'. Do we add -es for 'we', or use the base verb?",
+                explanation: "With I / you / we / they, we use the base verb 'go'."
+            },
+            {
+                id: 3,
+                sentenceStart: "I",
+                sentenceEnd: "computer games.",
+                options: { A: "not play", B: "don't play", C: "doesn't play" },
+                correct: "B",
+                hint: "The subject is 'I'. How do we make a negative sentence with 'I'?",
+                explanation: "With 'I', the present simple negative is 'don't play'."
+            },
+            {
+                id: 4,
+                sentenceStart: "Mina",
+                sentenceEnd: "school at half past four.",
+                options: { A: "finish", B: "finishes", C: "not finish" },
+                correct: "B",
+                hint: "Mina is 'she'. Verbs ending in -sh take -es in the 3rd person singular!",
+                explanation: "'Mina' is 3rd person singular (she), and verbs ending in -sh add -es: 'finishes'."
+            },
+            {
+                id: 5,
+                sentenceStart: "I",
+                sentenceEnd: "in a big house.",
+                options: { A: "live", B: "lives", C: "living" },
+                correct: "A",
+                hint: "The subject is 'I'. Do we need an -s after 'I'?",
+                explanation: "With 'I', we use the base form 'live' (no -s)."
+            }
+        ];
+
+        // Exercise 4 Data: Complete the dialogues (6 marks - 1 mark each)
+        const ex4Data = [
+            {
+                id: 1,
+                speakerA1: "What time",
+                speakerA2: "(the train / leave) in the morning?",
+                speakerB: "At quarter past eight.",
+                inputIn: "A",
+                model: "does the train leave",
+                accepted: ["does the train leave"],
+                hint: "'the train' = 'it'. Use 'does' + subject ('the train') + base verb ('leave')!",
+                explanation: "Singular subject 'the train' needs 'does' + 'the train' + 'leave' (no -s on leave!)."
+            },
+            {
+                id: 2,
+                speakerA1: "",
+                speakerA2: "(Xu / go) to your school?",
+                speakerB: "Yes, she's in my class.",
+                inputIn: "A",
+                model: "Does Xu go",
+                accepted: ["does xu go"],
+                hint: "Xu is a girl ('she'). Start the question with 'Does' + 'Xu' + base verb 'go'!",
+                explanation: "For 'Xu' (she), we form the question with 'Does Xu go'."
+            },
+            {
+                id: 3,
+                speakerA1: "Do you have a green pen?",
+                speakerB1: "No,",
+                speakerB2: ".",
+                inputIn: "B",
+                model: "I don't",
+                accepted: ["i don't", "i do not", "we don't", "we do not"],
+                hint: "Short answer to 'Do you...?' → 'No, I ...'",
+                explanation: "The negative short answer to 'Do you...?' is 'No, I don't.'"
+            },
+            {
+                id: 4,
+                speakerA1: "When",
+                speakerA2: "(you / see) your friends?",
+                speakerB: "On Saturdays.",
+                inputIn: "A",
+                model: "do you see",
+                accepted: ["do you see"],
+                hint: "With 'you', use the question helper 'do': 'do you see'.",
+                explanation: "With 'you', present simple questions use 'do you see'."
+            },
+            {
+                id: 5,
+                speakerA1: "Do we have Geography on Wednesday?",
+                speakerB1: "Yes,",
+                speakerB2: ".",
+                inputIn: "B",
+                model: "we do",
+                accepted: ["we do", "you do"],
+                hint: "Positive short answer to 'Do we...?' → 'Yes, we ...'",
+                explanation: "The positive short answer to 'Do we...?' is 'Yes, we do.'"
+            },
+            {
+                id: 6,
+                speakerA1: "Does Mr Wood live near the school?",
+                speakerB1: "No,",
+                speakerB2: ".",
+                inputIn: "B",
+                model: "he doesn't",
+                accepted: ["he doesn't", "he does not"],
+                hint: "Mr Wood is a man ('he'). Question starts with 'Does', so 'No, he ...'",
+                explanation: "Mr Wood = 'he', so the negative short answer is 'No, he doesn't.'"
+            }
+        ];
+
+        // Exercise 5 Data: Adverbs of frequency (5 marks - 1 mark each)
+        const ex5Data = [
+            {
+                id: 1,
+                prompt: "I walk home after school. (★★★★)",
+                stars: "★★★★ = always",
+                model: "I always walk home after school.",
+                accepted: ["i always walk home after school"],
+                hint: "★★★★ means 'always'. Put 'always' BEFORE the main verb 'walk'!",
+                explanation: "'always' goes before the main verb 'walk': I always walk home after school."
+            },
+            {
+                id: 2,
+                prompt: "We go to the park in winter. (★)",
+                stars: "★ = not often",
+                model: "We don't often go to the park in winter.",
+                accepted: [
+                    "we don't often go to the park in winter",
+                    "we do not often go to the park in winter",
+                    "we not often go to the park in winter"
+                ],
+                hint: "★ is 'not often'. With a verb like 'go', we write 'We don't often go...' (or 'We not often go...').",
+                explanation: "With a main verb, 'not often' forms a negative with don't: 'We don't often go to the park in winter.' (We also accept 'We not often go...')."
+            },
+            {
+                id: 3,
+                prompt: "Abigail and Nora do their homework in the kitchen. (★★★)",
+                stars: "★★★ = usually",
+                model: "Abigail and Nora usually do their homework in the kitchen.",
+                accepted: ["abigail and nora usually do their homework in the kitchen"],
+                hint: "★★★ means 'usually'. Put 'usually' right before 'do their homework'!",
+                explanation: "'usually' goes before the main verb 'do': Abigail and Nora usually do their homework in the kitchen."
+            },
+            {
+                id: 4,
+                prompt: "You tidy your room! (—)",
+                stars: "— = never",
+                model: "You never tidy your room!",
+                accepted: ["you never tidy your room"],
+                hint: "— means 'never'. Put 'never' before the verb 'tidy'!",
+                explanation: "'never' goes before the verb 'tidy': You never tidy your room!"
+            },
+            {
+                id: 5,
+                prompt: "Rafi is busy on Saturday mornings. (★★)",
+                stars: "★★ = sometimes",
+                model: "Rafi is sometimes busy on Saturday mornings.",
+                accepted: ["rafi is sometimes busy on saturday mornings"],
+                hint: "TRAP ALERT! The verb here is 'is' (to be). Does 'sometimes' go BEFORE 'is' or AFTER 'is'?",
+                explanation: "With the verb 'to be' (am / is / are), the adverb goes AFTER the verb: 'Rafi is sometimes busy on Saturday mornings.'"
+            }
+        ];
+
+        // Exercise 6 Data: Write the dates (7 marks - 1 mark each)
+        const ex6Data = [
+            {
+                id: 1,
+                code: "day 31 of month 3",
+                dayAnswer: "thirty-first",
+                dayAccepted: ["thirty-first", "thirty first", "31st"],
+                monthAnswer: "March",
+                monthAccepted: ["march"],
+                hint: "Day 31 = thirty-first. Month 3 = March.",
+                explanation: "the thirty-first of March"
+            },
+            {
+                id: 2,
+                code: "day 12 of month 9",
+                dayAnswer: "twelfth",
+                dayAccepted: ["twelfth", "12th"],
+                monthAnswer: "September",
+                monthAccepted: ["september"],
+                hint: "Watch the spelling of 12th: t-w-e-l-f-t-h! Month 9 = September.",
+                explanation: "the twelfth of September (Watch out: twelfth has an 'f', not 'v'!)"
+            },
+            {
+                id: 3,
+                code: "day 4 of month 12",
+                dayAnswer: "fourth",
+                dayAccepted: ["fourth", "4th"],
+                monthAnswer: "December",
+                monthAccepted: ["december"],
+                hint: "Day 4 = fourth. Month 12 = December.",
+                explanation: "the fourth of December"
+            },
+            {
+                id: 4,
+                code: "day 21 of month 6",
+                dayAnswer: "twenty-first",
+                dayAccepted: ["twenty-first", "twenty first", "21st"],
+                monthAnswer: "June",
+                monthAccepted: ["june"],
+                hint: "Day 21 = twenty-first. Month 6 = June.",
+                explanation: "the twenty-first of June"
+            },
+            {
+                id: 5,
+                code: "day 18 of month 2",
+                dayAnswer: "eighteenth",
+                dayAccepted: ["eighteenth", "18th"],
+                monthAnswer: "February",
+                monthAccepted: ["february"],
+                hint: "Day 18 = eighteenth. Month 2 = February (remember the 'r' after Feb!).",
+                explanation: "the eighteenth of February"
+            },
+            {
+                id: 6,
+                code: "day 1 of month 7",
+                dayAnswer: "first",
+                dayAccepted: ["first", "1st"],
+                monthAnswer: "July",
+                monthAccepted: ["july"],
+                hint: "Day 1 = first. Month 7 = July.",
+                explanation: "the first of July"
+            },
+            {
+                id: 7,
+                code: "day 29 of month 10",
+                dayAnswer: "twenty-ninth",
+                dayAccepted: ["twenty-ninth", "twenty ninth", "29th"],
+                monthAnswer: "October",
+                monthAccepted: ["october"],
+                hint: "Day 29 = twenty-ninth (n-i-n-t-h, no 'e'!). Month 10 = October.",
+                explanation: "the twenty-ninth of October"
+            }
+        ];
+
+        // Exercise 7 Data: Pictures 1-8 Household Jobs (7 marks - 1 mark each, #1 is example)
+        const ex7Data = [
+            {
+                id: 1,
+                isExample: true,
+                subject: "Georgina",
+                verb: "loads",
+                rest: "the dishwasher.",
+                emoji: "🍽️",
+                bg: "from-slate-100 to-slate-200",
+                svgCaption: "Loading plates into the dishwasher"
+            },
+            {
+                id: 2,
+                isExample: false,
+                subject: "I",
+                verb: "tidy",
+                accepted: ["tidy", "clean"],
+                rest: "my room.",
+                emoji: "🧸",
+                bg: "from-sky-50 to-indigo-100",
+                svgCaption: "Putting toys & books away in bedroom",
+                hint: "The subject is 'I'! Do NOT add -s: 'I tidy my room.'",
+                explanation: "I tidy my room. (Base form 'tidy' because the subject is 'I')."
+            },
+            {
+                id: 3,
+                isExample: false,
+                subject: "Tessa",
+                verb: "sets",
+                accepted: ["sets", "lays"],
+                rest: "the table.",
+                emoji: "🍴",
+                bg: "from-amber-50 to-orange-100",
+                svgCaption: "Putting plates, forks & knives on the table",
+                hint: "Tessa = 'she'. Don't forget the -s on 'set'!",
+                explanation: "Tessa sets the table. (3rd person singular -s)."
+            },
+            {
+                id: 4,
+                isExample: false,
+                subject: "Sam",
+                verb: "takes",
+                accepted: ["takes"],
+                rest: "the dog for a walk.",
+                emoji: "🐕‍🦺",
+                bg: "from-emerald-50 to-teal-100",
+                svgCaption: "Walking the dog outside on a lead",
+                hint: "What verb goes with '... the dog for a walk'? Remember Sam = 'he'!",
+                explanation: "Sam takes the dog for a walk."
+            },
+            {
+                id: 5,
+                isExample: false,
+                subject: "Dad",
+                verb: "does",
+                accepted: ["does"],
+                rest: "the shopping.",
+                emoji: "🛒",
+                bg: "from-purple-50 to-fuchsia-100",
+                svgCaption: "Buying groceries with a supermarket trolley",
+                hint: "In English, we say 'do the shopping'. For 'Dad' (he), 'do' becomes...",
+                explanation: "Dad does the shopping. ('do' + -es = 'does')."
+            },
+            {
+                id: 6,
+                isExample: false,
+                subject: "You",
+                verb: "vacuum",
+                accepted: ["vacuum", "clean", "sweep", "hoover"],
+                rest: "the floor.",
+                emoji: "🧹",
+                bg: "from-rose-50 to-pink-100",
+                svgCaption: "Using a vacuum cleaner on the carpet",
+                hint: "TRAP ALERT! The subject is 'You' (no -s!). Unit 1 verb for cleaning the carpet: 'vacuum'!",
+                explanation: "You vacuum the floor. (No -s because the subject is 'You'!)"
+            },
+            {
+                id: 7,
+                isExample: false,
+                subject: "Freddie",
+                verb: "makes",
+                accepted: ["makes"],
+                rest: "the bed.",
+                emoji: "🛏️",
+                bg: "from-cyan-50 to-sky-100",
+                svgCaption: "Straightening the duvet and pillows",
+                hint: "Freddie = 'he'. What verb goes with '... the bed'?",
+                explanation: "Freddie makes the bed."
+            },
+            {
+                id: 8,
+                isExample: false,
+                subject: "Lucy",
+                verb: "feeds",
+                accepted: ["feeds"],
+                rest: "the cat.",
+                emoji: "🐱",
+                bg: "from-yellow-50 to-amber-100",
+                svgCaption: "Giving a bowl of food to the cat",
+                hint: "Lucy = 'she'. What verb means giving food to a pet?",
+                explanation: "Lucy feeds the cat."
+            }
+        ];
+
+        // ==================== RENDER FUNCTIONS ====================
+        function normalizeText(str) {
+            return (str || '')
+                .toLowerCase()
+                .trim()
+                .replace(/[’.!?]/g, "'")
+                .replace(/'+/g, "'")
+                .replace(/\s+/g, " ")
+                .replace(/'$/g, "");
+        }
+
+        function isValidEnglishDate(str) {
+            const s = normalizeText(str);
+            const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+            const hasMonth = months.some(m => s.includes(m));
+            const hasDayNum = /\b([1-9]|[12][0-9]|3[01])(st|nd|rd|th)?\b/.test(s);
+            const ordinals = ["first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth","twentieth","twenty-first","twenty-second","twenty-third","twenty-fourth","twenty-fifth","twenty-sixth","twenty-seventh","twenty-eighth","twenty-ninth","thirtieth","thirty-first"];
+            const hasOrdinal = ordinals.some(o => s.includes(o) || s.includes(o.replace('-', ' ')));
+            return hasMonth && (hasDayNum || hasOrdinal);
+        }
+
+        function renderExercise1() {
+            const container = document.getElementById('ex1-questions');
+            container.innerHTML = ex1Data.map(item => `
+                <div class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:border-indigo-200 transition">
+                    <div class="flex flex-wrap items-center gap-2 text-sm sm:text-base">
+                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center shrink-0">${item.id}</span>
+                        <span>${item.before}</span>
+                        <input id="ex1-input-${item.id}" type="text" placeholder="1–3 words or date..."
+                            class="px-3 py-1.5 rounded-xl border-2 border-slate-300 focus:border-indigo-500 focus:outline-none text-sm font-bold text-indigo-900 w-48 sm:w-56 transition">
+                        <span>${item.after}</span>
+                        <button onclick="toggleHint('ex1-hint-${item.id}')" class="ml-auto text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <i class="ph-fill ph-lightbulb"></i> Hint
+                        </button>
+                    </div>
+                    <div id="ex1-hint-${item.id}" class="hidden mt-2 text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                    <div id="ex1-exp-${item.id}" class="hidden mt-2 text-xs px-3 py-1.5 rounded-xl font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        function renderExercise2() {
+            const container = document.getElementById('ex2-questions');
+            container.innerHTML = ex2Data.map(item => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white hover:border-purple-200 transition space-y-2">
+                    <div class="flex items-start justify-between gap-2">
+                        <label for="ex2-input-${item.id}" class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center shrink-0">${item.id}</span>
+                            ${item.question}
+                        </label>
+                        <button onclick="toggleHint('ex2-hint-${item.id}')" class="text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg flex items-center gap-1 shrink-0">
+                            <i class="ph-fill ph-lightbulb"></i> Hint
+                        </button>
+                    </div>
+                    <input id="ex2-input-${item.id}" type="text" placeholder="Type your full answer here..."
+                        class="w-full px-3.5 py-2 rounded-xl border-2 border-slate-300 focus:border-purple-500 focus:outline-none text-sm font-bold text-purple-900 transition">
+                    <div id="ex2-hint-${item.id}" class="hidden text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                    <div id="ex2-exp-${item.id}" class="hidden text-xs px-3 py-1.5 rounded-xl font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        let ex3Selections = {};
+        function renderExercise3() {
+            const container = document.getElementById('ex3-questions');
+            container.innerHTML = ex3Data.map(item => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 text-sm sm:text-base">
+                        <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0">${item.id}</span>
+                        <span>${item.sentenceStart} <span id="ex3-blank-${item.id}" class="inline-block min-w-[90px] border-b-2 border-amber-400 text-center font-bold text-amber-700 px-2">_______</span> ${item.sentenceEnd}</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        ${Object.entries(item.options).map(([letter, text]) => `
+                            <button id="ex3-btn-${item.id}-${letter}" onclick="selectEx3('${item.id}', '${letter}', '${text.replace(/'/g, "\\'")}')"
+                                class="px-3.5 py-1.5 rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-amber-50 text-xs sm:text-sm font-bold text-slate-700 transition">
+                                <span class="text-amber-600 mr-1">${letter}</span> ${text}
+                            </button>
+                        `).join('')}
+                        <button onclick="toggleHint('ex3-hint-${item.id}')" class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1.5 rounded-lg">
+                            <i class="ph-fill ph-lightbulb"></i>
+                        </button>
+                    </div>
+                    <div id="ex3-hint-${item.id}" class="hidden w-full text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectEx3(qId, letter, text) {
+            ex3Selections[qId] = letter;
+            document.getElementById(`ex3-blank-${qId}`).textContent = text;
+            ['A', 'B', 'C'].forEach(l => {
+                const btn = document.getElementById(`ex3-btn-${qId}-${l}`);
+                if (l === letter) {
+                    btn.className = 'px-3.5 py-1.5 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-xs sm:text-sm font-bold text-white shadow-sm transition';
+                } else {
+                    btn.className = 'px-3.5 py-1.5 rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-amber-50 text-xs sm:text-sm font-bold text-slate-700 transition';
+                }
+            });
+        }
+
+        function renderExercise4() {
+            const container = document.getElementById('ex4-questions');
+            container.innerHTML = ex4Data.map(item => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">${item.id}</span>
+                        <button onclick="toggleHint('ex4-hint-${item.id}')" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <i class="ph-fill ph-lightbulb"></i> Hint
+                        </button>
+                    </div>
+                    ${item.inputIn === 'A' ? `
+                        <div class="text-sm sm:text-base leading-relaxed">
+                            <strong>A:</strong> ${item.speakerA1}
+                            <input id="ex4-input-${item.id}" type="text" placeholder="type verb form..."
+                                class="px-2.5 py-1 rounded-xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none text-sm font-bold text-emerald-900 w-44 mx-1">
+                            <span class="text-slate-500 font-medium">${item.speakerA2}</span>
+                        </div>
+                        <div class="text-sm sm:text-base text-slate-700">
+                            <strong>B:</strong> ${item.speakerB}
+                        </div>
+                    ` : `
+                        <div class="text-sm sm:text-base text-slate-800">
+                            <strong>A:</strong> ${item.speakerA1}
+                        </div>
+                        <div class="text-sm sm:text-base flex items-center gap-1.5">
+                            <strong>B:</strong> ${item.speakerB1}
+                            <input id="ex4-input-${item.id}" type="text" placeholder="short answer..."
+                                class="px-2.5 py-1 rounded-xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none text-sm font-bold text-emerald-900 w-36">${item.speakerB2}
+                        </div>
+                    `}
+                    <div id="ex4-hint-${item.id}" class="hidden text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                    <div id="ex4-exp-${item.id}" class="hidden text-xs px-3 py-1.5 rounded-xl font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        function renderExercise5() {
+            const container = document.getElementById('ex5-questions');
+            container.innerHTML = ex5Data.map(item => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-800">
+                            <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-700 font-bold text-xs flex items-center justify-center shrink-0">${item.id}</span>
+                            <span>${item.prompt}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">${item.stars}</span>
+                            <button onclick="toggleHint('ex5-hint-${item.id}')" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                                <i class="ph-fill ph-lightbulb"></i> Hint
+                            </button>
+                        </div>
+                    </div>
+                    <input id="ex5-input-${item.id}" type="text" placeholder="Rewrite the full sentence here..."
+                        class="w-full px-3.5 py-2 rounded-xl border-2 border-slate-300 focus:border-pink-500 focus:outline-none text-sm font-bold text-pink-900 transition">
+                    <div id="ex5-hint-${item.id}" class="hidden text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                    <div id="ex5-exp-${item.id}" class="hidden text-xs px-3 py-1.5 rounded-xl font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        function renderExercise6() {
+            const container = document.getElementById('ex6-questions');
+            container.innerHTML = ex6Data.map(item => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-cyan-100 text-cyan-800 font-bold text-xs flex items-center justify-center">${item.id}</span>
+                            <span class="font-extrabold text-slate-800 text-sm sm:text-base">${item.code}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="speakText('the ${item.dayAnswer} of ${item.monthAnswer}')" class="text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-700 px-2 py-1 rounded-lg font-bold" title="Hear pronunciation">
+                                <i class="ph-fill ph-speaker-high"></i>
+                            </button>
+                            <button onclick="toggleHint('ex6-hint-${item.id}')" class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">
+                                <i class="ph-fill ph-lightbulb"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 text-sm font-semibold text-slate-700">
+                        <span>the</span>
+                        <input id="ex6-day-${item.id}" type="text" placeholder="ordinal (e.g. fourth)"
+                            class="px-2.5 py-1.5 rounded-xl border-2 border-slate-300 focus:border-cyan-500 focus:outline-none text-sm font-bold text-cyan-900 w-36">
+                        <span>of</span>
+                        <input id="ex6-month-${item.id}" type="text" placeholder="Month"
+                            class="px-2.5 py-1.5 rounded-xl border-2 border-slate-300 focus:border-cyan-500 focus:outline-none text-sm font-bold text-cyan-900 w-32">
+                    </div>
+                    <div id="ex6-hint-${item.id}" class="hidden text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200">
+                        💡 ${item.hint}
+                    </div>
+                    <div id="ex6-exp-${item.id}" class="hidden text-xs px-3 py-1.5 rounded-xl font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        function renderExercise7() {
+            const container = document.getElementById('ex7-questions');
+            container.innerHTML = ex7Data.map(item => `
+                <div class="rounded-2xl border-2 ${item.isExample ? 'border-slate-200 bg-slate-50' : 'border-violet-100 bg-white'} p-3.5 flex flex-col justify-between space-y-3 shadow-sm">
+                    <!-- Illustrated Picture Box -->
+                    <div class="relative rounded-xl bg-gradient-to-br ${item.bg} p-4 text-center border border-black/5">
+                        <span class="absolute top-2 left-2 w-6 h-6 rounded-lg bg-white/90 text-slate-800 font-display font-bold text-xs flex items-center justify-center shadow-sm">${item.id}</span>
+                        ${item.isExample ? `<span class="absolute top-2 right-2 px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-bold uppercase">Example</span>` : `
+                            <button onclick="toggleHint('ex7-hint-${item.id}')" class="absolute top-2 right-2 w-6 h-6 rounded-lg bg-white/90 text-amber-600 flex items-center justify-center shadow-sm" title="Hint">
+                                <i class="ph-fill ph-lightbulb text-xs"></i>
+                            </button>
+                        `}
+                        <div class="text-4xl my-1 select-none">${item.emoji}</div>
+                        <div class="text-[11px] font-semibold text-slate-600 leading-tight">${item.svgCaption}</div>
+                    </div>
+
+                    <!-- Sentence Completion -->
+                    <div class="space-y-1.5">
+                        ${item.isExample ? `
+                            <div class="text-sm font-semibold text-slate-700 text-center py-1">
+                                ${item.subject} <strong class="text-violet-700 underline">${item.verb}</strong> ${item.rest}
+                            </div>
+                        ` : `
+                            <div class="flex flex-wrap items-center justify-center gap-1.5 text-sm font-semibold text-slate-800">
+                                <span>${item.subject}</span>
+                                <input id="ex7-input-${item.id}" type="text" placeholder="verb..."
+                                    class="px-2.5 py-1 rounded-xl border-2 border-slate-300 focus:border-violet-500 focus:outline-none text-sm font-bold text-violet-900 w-24 text-center">
+                                <span>${item.rest}</span>
+                            </div>
+                            <div id="ex7-hint-${item.id}" class="hidden text-[11px] bg-amber-50 text-amber-900 px-2.5 py-1.5 rounded-lg border border-amber-200">
+                                💡 ${item.hint}
+                            </div>
+                            <div id="ex7-exp-${item.id}" class="hidden text-[11px] px-2.5 py-1 rounded-lg font-semibold text-center"></div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function toggleEmailClues() {
+            cluesHighlighted = !cluesHighlighted;
+            document.querySelectorAll('.email-clue').forEach(el => {
+                if (cluesHighlighted) {
+                    el.classList.add('bg-amber-200', 'font-bold', 'text-slate-900');
+                } else {
+                    el.classList.remove('bg-amber-200', 'font-bold', 'text-slate-900');
+                }
+            });
+        }
+
+        // ==================== CHECKING & GRADING LOGIC ====================
+        function checkExercise1() {
+            let score = 0;
+            ex1Data.forEach(item => {
+                const input = document.getElementById(`ex1-input-${item.id}`);
+                const exp = document.getElementById(`ex1-exp-${item.id}`);
+                const val = normalizeText(input.value);
+                const isMatch = item.accepted.includes(val) || (item.acceptAnyValidDate && isValidEnglishDate(val));
+
+                input.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (isMatch) {
+                    score += 2;
+                    input.classList.add('correct-input');
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! (+2 marks) — ${item.explanation}`;
+                } else {
+                    input.classList.add('wrong-input');
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Model answer: <strong>${item.model}</strong> — ${item.explanation}`;
+                }
+            });
+
+            sectionScores.ex1 = score;
+            document.getElementById('score-badge-ex1').textContent = `${score} / 10 Marks`;
+            document.getElementById('feedback-ex1').textContent = score === 10 ? "🌟 Perfect 10/10 on Listening!" : `You scored ${score}/10. Check the feedback above!`;
+            document.getElementById('feedback-ex1').className = score === 10 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 6 ? 'correct' : 'wrong');
+            awardXP(score * 3);
+            updateHUDMarks();
+        }
+
+        function fillExercise1Sample() {
+            ex1Data.forEach(item => {
+                document.getElementById(`ex1-input-${item.id}`).value = item.model;
+            });
+            checkExercise1();
+        }
+
+        function checkExercise2() {
+            let score = 0;
+            ex2Data.forEach(item => {
+                const input = document.getElementById(`ex2-input-${item.id}`);
+                const exp = document.getElementById(`ex2-exp-${item.id}`);
+                const val = normalizeText(input.value);
+
+                // Flexible keyword matching + exact accepted list
+                let isMatch = item.accepted.includes(val);
+                if (!isMatch) {
+                    if (item.id === 1 && val.includes("dog") && val.includes("walk")) isMatch = true;
+                    if (item.id === 2 && val.includes("make") && val.includes("bed")) isMatch = true;
+                    if (item.id === 3 && (val.includes("mum") || val.includes("mother"))) isMatch = true;
+                    if (item.id === 4 && val.includes("feed")) isMatch = true;
+                    if (item.id === 5 && (val.includes("12 october") || val.includes("12th october") || val.includes("twelfth of october") || val.includes("weekend between"))) isMatch = true;
+                }
+
+                input.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (isMatch) {
+                    score += 2;
+                    input.classList.add('correct-input');
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! (+2 marks) Model answer: <strong>${item.model}</strong>`;
+                } else {
+                    input.classList.add('wrong-input');
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Model answer: <strong>${item.model}</strong> — ${item.explanation}`;
+                }
+            });
+
+            sectionScores.ex2 = score;
+            document.getElementById('score-badge-ex2').textContent = `${score} / 10 Marks`;
+            document.getElementById('feedback-ex2').textContent = score === 10 ? "🌟 Awesome! 10/10 on Reading!" : `You scored ${score}/10.`;
+            document.getElementById('feedback-ex2').className = score === 10 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 6 ? 'correct' : 'wrong');
+            awardXP(score * 3);
+            updateHUDMarks();
+        }
+
+        function fillExercise2Sample() {
+            ex2Data.forEach(item => {
+                document.getElementById(`ex2-input-${item.id}`).value = item.model;
+            });
+            checkExercise2();
+        }
+
+        function checkExercise3() {
+            let score = 0;
+            ex3Data.forEach(item => {
+                const picked = ex3Selections[item.id];
+                ['A', 'B', 'C'].forEach(letter => {
+                    const btn = document.getElementById(`ex3-btn-${item.id}-${letter}`);
+                    if (letter === item.correct) {
+                        btn.className = 'px-3.5 py-1.5 rounded-xl border-2 border-emerald-600 bg-emerald-600 text-xs sm:text-sm font-bold text-white shadow-sm transition';
+                    } else if (letter === picked && picked !== item.correct) {
+                        btn.className = 'px-3.5 py-1.5 rounded-xl border-2 border-rose-500 bg-rose-500 text-xs sm:text-sm font-bold text-white transition';
+                    }
+                });
+                if (picked === item.correct) score += 1;
+            });
+
+            sectionScores.ex3 = score;
+            document.getElementById('score-badge-ex3').textContent = `${score} / 5 Marks`;
+            document.getElementById('feedback-ex3').textContent = score === 5 ? "🌟 5/5 Perfect Multiple Choice!" : `You scored ${score}/5. Green buttons show the correct choice!`;
+            document.getElementById('feedback-ex3').className = score === 5 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 4 ? 'correct' : 'wrong');
+            awardXP(score * 4);
+            updateHUDMarks();
+        }
+
+        function checkExercise4() {
+            let score = 0;
+            ex4Data.forEach(item => {
+                const input = document.getElementById(`ex4-input-${item.id}`);
+                const exp = document.getElementById(`ex4-exp-${item.id}`);
+                const val = normalizeText(input.value);
+                const isMatch = item.accepted.includes(val);
+
+                input.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (isMatch) {
+                    score += 1;
+                    input.classList.add('correct-input');
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! (+1 mark)`;
+                } else {
+                    input.classList.add('wrong-input');
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Correct answer: <strong>${item.model}</strong> — ${item.explanation}`;
+                }
+            });
+
+            sectionScores.ex4 = score;
+            document.getElementById('score-badge-ex4').textContent = `${score} / 6 Marks`;
+            document.getElementById('feedback-ex4').textContent = score === 6 ? "🌟 6/6 Dialogue Master!" : `You scored ${score}/6.`;
+            document.getElementById('feedback-ex4').className = score === 6 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 4 ? 'correct' : 'wrong');
+            awardXP(score * 4);
+            updateHUDMarks();
+        }
+
+        function fillExercise4Sample() {
+            ex4Data.forEach(item => {
+                document.getElementById(`ex4-input-${item.id}`).value = item.model;
+            });
+            checkExercise4();
+        }
+
+        function checkExercise5() {
+            let score = 0;
+            ex5Data.forEach(item => {
+                const input = document.getElementById(`ex5-input-${item.id}`);
+                const exp = document.getElementById(`ex5-exp-${item.id}`);
+                const val = normalizeText(input.value);
+                const isMatch = item.accepted.includes(val);
+
+                input.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (isMatch) {
+                    score += 1;
+                    input.classList.add('correct-input');
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! (+1 mark) — ${item.explanation}`;
+                } else {
+                    input.classList.add('wrong-input');
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Correct sentence: <strong>${item.model}</strong>`;
+                }
+            });
+
+            sectionScores.ex5 = score;
+            document.getElementById('score-badge-ex5').textContent = `${score} / 5 Marks`;
+            document.getElementById('feedback-ex5').textContent = score === 5 ? "🌟 5/5 Adverbs Champion!" : `You scored ${score}/5.`;
+            document.getElementById('feedback-ex5').className = score === 5 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 4 ? 'correct' : 'wrong');
+            awardXP(score * 4);
+            updateHUDMarks();
+        }
+
+        function fillExercise5Sample() {
+            ex5Data.forEach(item => {
+                document.getElementById(`ex5-input-${item.id}`).value = item.model;
+            });
+            checkExercise5();
+        }
+
+        function checkExercise6() {
+            let score = 0;
+            ex6Data.forEach(item => {
+                const dayInput = document.getElementById(`ex6-day-${item.id}`);
+                const monthInput = document.getElementById(`ex6-month-${item.id}`);
+                const exp = document.getElementById(`ex6-exp-${item.id}`);
+
+                const dayVal = normalizeText(dayInput.value);
+                const monthVal = normalizeText(monthInput.value);
+
+                const dayOk = item.dayAccepted.includes(dayVal);
+                const monthOk = item.monthAccepted.includes(monthVal);
+
+                dayInput.classList.remove('correct-input', 'wrong-input');
+                monthInput.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                dayInput.classList.add(dayOk ? 'correct-input' : 'wrong-input');
+                monthInput.classList.add(monthOk ? 'correct-input' : 'wrong-input');
+
+                if (dayOk && monthOk) {
+                    score += 1;
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! <strong>the ${item.dayAnswer} of ${item.monthAnswer}</strong>`;
+                } else {
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Correct spelling: <strong>the ${item.dayAnswer} of ${item.monthAnswer}</strong>`;
+                }
+            });
+
+            sectionScores.ex6 = score;
+            document.getElementById('score-badge-ex6').textContent = `${score} / 7 Marks`;
+            document.getElementById('feedback-ex6').textContent = score === 7 ? "🌟 7/7 Date Master!" : `You scored ${score}/7. Check spelling carefully!`;
+            document.getElementById('feedback-ex6').className = score === 7 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 5 ? 'correct' : 'wrong');
+            awardXP(score * 4);
+            updateHUDMarks();
+        }
+
+        function fillExercise6Sample() {
+            ex6Data.forEach(item => {
+                document.getElementById(`ex6-day-${item.id}`).value = item.dayAnswer;
+                document.getElementById(`ex6-month-${item.id}`).value = item.monthAnswer;
+            });
+            checkExercise6();
+        }
+
+        function checkExercise7() {
+            let score = 0;
+            ex7Data.filter(i => !i.isExample).forEach(item => {
+                const input = document.getElementById(`ex7-input-${item.id}`);
+                const exp = document.getElementById(`ex7-exp-${item.id}`);
+                const val = normalizeText(input.value);
+                const isMatch = item.accepted.includes(val);
+
+                input.classList.remove('correct-input', 'wrong-input');
+                exp.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (isMatch) {
+                    score += 1;
+                    input.classList.add('correct-input');
+                    exp.classList.add('bg-emerald-50', 'text-emerald-800');
+                    exp.innerHTML = `✅ Correct! (${item.subject} <strong>${item.verb}</strong>)`;
+                } else {
+                    input.classList.add('wrong-input');
+                    exp.classList.add('bg-rose-50', 'text-rose-800');
+                    exp.innerHTML = `❌ Answer: <strong>${item.verb}</strong>`;
+                }
+            });
+
+            sectionScores.ex7 = score;
+            document.getElementById('score-badge-ex7').textContent = `${score} / 7 Marks`;
+            document.getElementById('feedback-ex7').textContent = score === 7 ? "🌟 7/7 Household Jobs Pro!" : `You scored ${score}/7.`;
+            document.getElementById('feedback-ex7').className = score === 7 ? "text-sm font-bold text-emerald-600" : "text-sm font-bold text-amber-600";
+            playTone(score >= 5 ? 'correct' : 'wrong');
+            awardXP(score * 4);
+            updateHUDMarks();
+        }
+
+        function fillExercise7Sample() {
+            ex7Data.filter(i => !i.isExample).forEach(item => {
+                document.getElementById(`ex7-input-${item.id}`).value = item.verb;
+            });
+            checkExercise7();
+        }
+
+        function checkAllExercises() {
+            checkExercise1();
+            checkExercise2();
+            checkExercise3();
+            checkExercise4();
+            checkExercise5();
+            checkExercise6();
+            checkExercise7();
+            const total = updateHUDMarks();
+            playTone('fanfare');
+
+            const modal = document.getElementById('celebration-modal');
+            const pct = Math.round((total / 50) * 100);
+            document.getElementById('modal-score').textContent = `${total} / 50`;
+            document.getElementById('modal-percent').textContent = `${pct}% — ${pct >= 90 ? '🏆 Grade A* Legend!' : pct >= 75 ? '🌟 Great Job! Almost 100%!' : '💪 Good effort! Check the red boxes and try again!'}`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeCelebrationModal() {
+            document.getElementById('celebration-modal').classList.add('hidden');
+        }
+
+        function resetEntireTest() {
+            sectionScores = { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex5: 0, ex6: 0, ex7: 0 };
+            ex3Selections = {};
+            renderExercise1();
+            renderExercise2();
+            renderExercise3();
+            renderExercise4();
+            renderExercise5();
+            renderExercise6();
+            renderExercise7();
+            ['ex1','ex2','ex3','ex4','ex5','ex6','ex7'].forEach(k => {
+                const max = { ex1: 10, ex2: 10, ex3: 5, ex4: 6, ex5: 5, ex6: 7, ex7: 7 }[k];
+                document.getElementById(`score-badge-${k}`).textContent = `0 / ${max} Marks`;
+                document.getElementById(`feedback-${k}`).textContent = '';
+            });
+            updateHUDMarks();
+        }
+
+        // ==================== TAB 2: SPEED ARCADE MINI-GAME ====================
+        const arcadePool = [
+            { cat: 'grammar', q: "My mum _______ sport on TV.", opts: ["doesn't watch", "don't watch", "not watch"], a: "doesn't watch" },
+            { cat: 'grammar', q: "We _______ swimming on Monday mornings.", opts: ["go", "goes", "going"], a: "go" },
+            { cat: 'grammar', q: "I _______ computer games.", opts: ["don't play", "doesn't play", "not play"], a: "don't play" },
+            { cat: 'grammar', q: "Mina _______ school at half past four.", opts: ["finishes", "finish", "not finish"], a: "finishes" },
+            { cat: 'grammar', q: "I _______ in a big house.", opts: ["live", "lives", "living"], a: "live" },
+            { cat: 'grammar', q: "What time _______ (the train / leave)?", opts: ["does the train leave", "do the train leave", "does the train leaves"], a: "does the train leave" },
+            { cat: 'grammar', q: "_______ (Xu / go) to your school?", opts: ["Does Xu go", "Do Xu go", "Does Xu goes"], a: "Does Xu go" },
+            { cat: 'grammar', q: "Does Mr Wood live near the school? — No, _______.", opts: ["he doesn't", "he don't", "it doesn't"], a: "he doesn't" },
+            { cat: 'grammar', q: "Rafi is busy on Saturday mornings. (** = sometimes)", opts: ["Rafi is sometimes busy", "Rafi sometimes is busy", "Rafi is busy sometimes not"], a: "Rafi is sometimes busy" },
+            { cat: 'grammar', q: "Picture 2: I _______ my room.", opts: ["tidy", "tidies", "tidying"], a: "tidy" },
+            { cat: 'grammar', q: "Picture 3: Tessa _______ the table.", opts: ["sets", "set", "does"], a: "sets" },
+            { cat: 'grammar', q: "Picture 4: Sam _______ the dog for a walk.", opts: ["takes", "take", "makes"], a: "takes" },
+            { cat: 'grammar', q: "Picture 5: Dad _______ the shopping.", opts: ["does", "do", "makes"], a: "does" },
+            { cat: 'grammar', q: "Picture 6: You _______ the floor.", opts: ["vacuum", "vacuums", "loads"], a: "vacuum" },
+            { cat: 'grammar', q: "Picture 7: Freddie _______ the bed.", opts: ["makes", "make", "sets"], a: "makes" },
+            { cat: 'grammar', q: "Picture 8: Lucy _______ the cat.", opts: ["feeds", "feed", "takes"], a: "feeds" },
+            { cat: 'dates', q: "day 31 of month 3", opts: ["the thirty-first of March", "the thirty-one of March", "the thirty-first of May"], a: "the thirty-first of March" },
+            { cat: 'dates', q: "day 12 of month 9", opts: ["the twelfth of September", "the twelveth of September", "the twelfth of October"], a: "the twelfth of September" },
+            { cat: 'dates', q: "day 4 of month 12", opts: ["the fourth of December", "the forth of December", "the fourth of November"], a: "the fourth of December" },
+            { cat: 'dates', q: "day 21 of month 6", opts: ["the twenty-first of June", "the twenty-one of June", "the twenty-first of July"], a: "the twenty-first of June" },
+            { cat: 'dates', q: "day 18 of month 2", opts: ["the eighteenth of February", "the eighteenth of Febuary", "the eighteen of February"], a: "the eighteenth of February" },
+            { cat: 'dates', q: "day 1 of month 7", opts: ["the first of July", "the oneth of July", "the first of June"], a: "the first of July" },
+            { cat: 'dates', q: "day 29 of month 10", opts: ["the twenty-ninth of October", "the twenty-nineth of October", "the twenty-ninth of August"], a: "the twenty-ninth of October" }
+        ];
+
+        let arcadeInterval = null;
+        let arcadeTimeLeft = 60;
+        let arcadeScore = 0;
+        let currentArcadeFilter = 'all';
+
+        function startArcadeGame(filter) {
+            currentArcadeFilter = filter;
+            arcadeTimeLeft = 60;
+            arcadeScore = 0;
+            document.getElementById('arcade-score').textContent = '0 pts';
+            document.getElementById('arcade-timer').textContent = '60s';
+            document.getElementById('arcade-category-badge').textContent = filter === 'dates' ? '📅 Dates Blitz' : filter === 'grammar' ? '⚡ Grammar & Chores' : '🔥 Full Test Mix';
+
+            if (arcadeInterval) clearInterval(arcadeInterval);
+            arcadeInterval = setInterval(() => {
+                arcadeTimeLeft--;
+                document.getElementById('arcade-timer').textContent = `${arcadeTimeLeft}s`;
+                if (arcadeTimeLeft <= 0) {
+                    clearInterval(arcadeInterval);
+                    endArcadeGame();
+                }
+            }, 1000);
+
+            nextArcadeQuestion();
+        }
+
+        function nextArcadeQuestion() {
+            const filtered = currentArcadeFilter === 'all' ? arcadePool : arcadePool.filter(x => x.cat === currentArcadeFilter);
+            const item = filtered[Math.floor(Math.random() * filtered.length)];
+            const shuffled = [...item.opts].sort(() => Math.random() - 0.5);
+
+            const stage = document.getElementById('arcade-stage');
+            stage.innerHTML = `
+                <div class="space-y-5">
+                    <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Tap the correct test answer!</div>
+                    <h4 class="text-xl sm:text-2xl font-bold text-slate-900 px-4">${item.q}</h4>
+                    <div class="grid gap-3 max-w-md mx-auto pt-2">
+                        ${shuffled.map(opt => `
+                            <button onclick="answerArcade('${opt.replace(/'/g, "\\'")}', '${item.a.replace(/'/g, "\\'")}')"
+                                class="btn-3d w-full py-3.5 px-5 rounded-2xl border-2 border-indigo-100 bg-indigo-50/60 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-bold text-slate-800 text-base transition">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function answerArcade(picked, correct) {
+            if (picked === correct) {
+                arcadeScore += 100;
+                currentStreak++;
+                playTone('correct');
+                awardXP(15);
+            } else {
+                currentStreak = 0;
+                playTone('wrong');
+            }
+            document.getElementById('hud-streak').textContent = currentStreak;
+            document.getElementById('arcade-score').textContent = `${arcadeScore} pts`;
+            nextArcadeQuestion();
+        }
+
+        function endArcadeGame() {
+            playTone('fanfare');
+            const stage = document.getElementById('arcade-stage');
+            stage.innerHTML = `
+                <div class="space-y-4 py-4">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                        <i class="ph-fill ph-medal text-4xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900">Time's Up!</h3>
+                    <p class="text-slate-600">Final Blitz Score: <strong class="text-emerald-600 text-xl">${arcadeScore} pts</strong></p>
+                    <button onclick="startArcadeGame('${currentArcadeFilter}')" class="btn-3d bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-sm">
+                        Play Again
+                    </button>
+                </div>
+            `;
+        }
+
+        // ==================== TAB 3 & 4: FLASHCARDS & MASTER KEY ====================
+        const flashcardsData = [
+            { group: 'Emails & Reading', q: "Ex 2.1: What does Julien's sister do after breakfast?", a: "She takes the dog for a walk." },
+            { group: 'Emails & Reading', q: "Ex 2.2: What does Julien's sister do before she goes to school?", a: "She makes her bed." },
+            { group: 'Emails & Reading', q: "Ex 2.3: Who usually tidies Eva's bedroom?", a: "Her mum (Eva's mum) usually tidies it." },
+            { group: 'Emails & Reading', q: "Ex 2.4: What does Eva do for her pet fish?", a: "She feeds it." },
+            { group: 'Emails & Reading', q: "Ex 2.5: When does Eva want a party?", a: "On Saturday 12 October." },
+            { group: 'Grammar & Dialogues', q: "Ex 4.1: What time _______ (the train / leave) in the morning?", a: "does the train leave" },
+            { group: 'Grammar & Dialogues', q: "Ex 4.2: _______ (Xu / go) to your school?", a: "Does Xu go" },
+            { group: 'Grammar & Dialogues', q: "Ex 4.3: Do you have a green pen? — No, _______.", a: "I don't" },
+            { group: 'Grammar & Dialogues', q: "Ex 4.4: When _______ (you / see) your friends?", a: "do you see" },
+            { group: 'Grammar & Dialogues', q: "Ex 4.5: Do we have Geography on Wednesday? — Yes, _______.", a: "we do" },
+            { group: 'Grammar & Dialogues', q: "Ex 4.6: Does Mr Wood live near the school? — No, _______.", a: "he doesn't" },
+            { group: 'Grammar & Dialogues', q: "Ex 5.2: We go to the park in winter. (* = not often)", a: "We don't often go to the park in winter." },
+            { group: 'Grammar & Dialogues', q: "Ex 5.5: Rafi is busy on Saturday mornings. (** = sometimes)", a: "Rafi is sometimes busy on Saturday mornings." },
+            { group: 'Dates & Chores', q: "Ex 6.1 & 6.2: day 31 of month 3 / day 12 of month 9", a: "the thirty-first of March / the twelfth of September" },
+            { group: 'Dates & Chores', q: "Ex 6.5 & 6.7: day 18 of month 2 / day 29 of month 10", a: "the eighteenth of February / the twenty-ninth of October" },
+            { group: 'Dates & Chores', q: "Ex 7: All 8 Household Chores Verbs in Order!", a: "1 loads, 2 tidy, 3 sets, 4 takes, 5 does, 6 vacuum, 7 makes, 8 feeds" }
+        ];
+
+        function filterFlashcards(group) {
+            const list = group === 'all' ? flashcardsData : flashcardsData.filter(f => f.group === group);
+            const grid = document.getElementById('flashcards-grid');
+            grid.innerHTML = list.map((card, idx) => `
+                <div onclick="this.classList.toggle('flipped'); playTone('correct');" class="flip-card h-44 cursor-pointer select-none">
+                    <div class="flip-card-inner relative w-full h-full">
+                        <div class="flip-card-front absolute inset-0 bg-gradient-to-br from-indigo-50 to-white border-2 border-indigo-100 rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">${card.group}</span>
+                                <span class="text-xs text-slate-400 font-bold"><i class="ph-bold ph-hand-tap"></i> Flip</span>
+                            </div>
+                            <div class="font-bold text-slate-800 text-sm sm:text-base text-center my-auto">${card.q}</div>
+                            <div class="text-[11px] text-center text-indigo-500 font-semibold">Click to reveal answer</div>
+                        </div>
+                        <div class="flip-card-back absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-600 text-white rounded-2xl p-4 flex flex-col justify-between shadow-md">
+                            <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-white/20 w-max">Official Answer</span>
+                            <div class="font-display font-bold text-base sm:text-lg text-center my-auto">${card.a}</div>
+                            <div class="text-[11px] text-center text-emerald-100">Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMasterKey() {
+            const container = document.getElementById('master-key-content');
+            container.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-5 text-sm">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-indigo-700 text-base">🎧 Exercise 1: Listening (10 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> Jordan's sister <strong>sets</strong> the table.</li>
+                            <li><strong>2.</strong> Jordan makes his bed after he <strong>gets up</strong> (or <em>has breakfast</em>).</li>
+                            <li><strong>3.</strong> Audrey's brother's birthday is on <strong>16 May / the sixteenth of May</strong>.</li>
+                            <li><strong>4.</strong> Audrey usually goes <strong>bowling</strong> (or <em>swimming / to the cinema</em>) on her birthday.</li>
+                            <li><strong>5.</strong> Audrey's uncle's birthday is on <strong>29 February / the twenty-ninth of February</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-purple-700 text-base">📧 Exercise 2: Read the Emails (10 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> She takes the dog for a walk.</li>
+                            <li><strong>2.</strong> She makes her bed.</li>
+                            <li><strong>3.</strong> Her mum (or Eva's mum) usually tidies it.</li>
+                            <li><strong>4.</strong> She feeds it.</li>
+                            <li><strong>5.</strong> On Saturday 12 October.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-amber-700 text-base">🎯 Exercise 3: Multiple Choice (5 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> <strong>C</strong> — doesn't watch</li>
+                            <li><strong>2.</strong> <strong>A</strong> — go</li>
+                            <li><strong>3.</strong> <strong>B</strong> — don't play</li>
+                            <li><strong>4.</strong> <strong>B</strong> — finishes</li>
+                            <li><strong>5.</strong> <strong>A</strong> — live</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-emerald-700 text-base">💬 Exercise 4: Present Simple Dialogues (6 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> What time <strong>does the train leave</strong> in the morning?</li>
+                            <li><strong>2.</strong> <strong>Does Xu go</strong> to your school?</li>
+                            <li><strong>3.</strong> No, <strong>I don't</strong>.</li>
+                            <li><strong>4.</strong> When <strong>do you see</strong> your friends?</li>
+                            <li><strong>5.</strong> Yes, <strong>we do</strong>.</li>
+                            <li><strong>6.</strong> No, <strong>he doesn't</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-pink-700 text-base">⭐ Exercise 5: Adverbs of Frequency (5 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> I <strong>always</strong> walk home after school.</li>
+                            <li><strong>2.</strong> We <strong>don't often</strong> go to the park in winter.</li>
+                            <li><strong>3.</strong> Abigail and Nora <strong>usually</strong> do their homework in the kitchen.</li>
+                            <li><strong>4.</strong> You <strong>never</strong> tidy your room!</li>
+                            <li><strong>5.</strong> Rafi <strong>is sometimes</strong> busy on Saturday mornings.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-cyan-700 text-base">📅 Exercise 6: Write the Dates (7 Marks)</h4>
+                        <ul class="space-y-1 text-slate-700">
+                            <li><strong>1.</strong> the <strong>thirty-first</strong> of <strong>March</strong></li>
+                            <li><strong>2.</strong> the <strong>twelfth</strong> of <strong>September</strong></li>
+                            <li><strong>3.</strong> the <strong>fourth</strong> of <strong>December</strong></li>
+                            <li><strong>4.</strong> the <strong>twenty-first</strong> of <strong>June</strong></li>
+                            <li><strong>5.</strong> the <strong>eighteenth</strong> of <strong>February</strong></li>
+                            <li><strong>6.</strong> the <strong>first</strong> of <strong>July</strong></li>
+                            <li><strong>7.</strong> the <strong>twenty-ninth</strong> of <strong>October</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 md:col-span-2">
+                        <h4 class="font-bold text-violet-700 text-base">🖼️ Exercise 7: Household Chores Pictures 1–8 (7 Marks)</h4>
+                        <div class="grid sm:grid-cols-4 gap-2 text-slate-700">
+                            <div><strong>1 (Ex).</strong> Georgina <strong>loads</strong> the dishwasher.</div>
+                            <div><strong>2.</strong> I <strong>tidy</strong> my room.</div>
+                            <div><strong>3.</strong> Tessa <strong>sets</strong> the table.</div>
+                            <div><strong>4.</strong> Sam <strong>takes</strong> the dog for a walk.</div>
+                            <div><strong>5.</strong> Dad <strong>does</strong> the shopping.</div>
+                            <div><strong>6.</strong> You <strong>vacuum</strong> the floor.</div>
+                            <div><strong>7.</strong> Freddie <strong>makes</strong> the bed.</div>
+                            <div><strong>8.</strong> Lucy <strong>feeds</strong> the cat.</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== NAVIGATION & INITIALIZATION ====================
+        function switchMainTab(tab) {
+            ['test', 'arcade', 'dojo', 'key'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tab) {
+                    view.classList.remove('hidden');
+                    btn.className = 'tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-indigo-600 text-white shrink-0';
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = 'tab-btn btn-3d px-4 py-2 rounded-xl font-display text-sm flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0';
+                }
+            });
+        }
+
+        window.onload = function () {
+            renderExercise1();
+            renderExercise2();
+            renderExercise3();
+            renderExercise4();
+            renderExercise5();
+            renderExercise6();
+            renderExercise7();
+            filterFlashcards('all');
+            renderMasterKey();
+        };
+    </script>
+</body>
+</html>
